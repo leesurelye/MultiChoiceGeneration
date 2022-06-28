@@ -1,18 +1,17 @@
 # author: yue
 # datetime: 2022/6/28 18:41
 # file: utils.py
-from settings import customer_setting as cs
-from settings import default_setting as ds
 
 import os
 from docx import Document
 import pandas as pd
+from settings import customer_setting as cs
 
 
 class WordUtils(object):
-    def __init__(self):
-        self.source_path = cs.word_file_path
-        self.output_path = ds.parsing_path
+    def __init__(self, word_file_path: str, output_file_path: str):
+        self.source_path = word_file_path
+        self.output_path = output_file_path
         if not os.path.exists(self.source_path):
             raise ValueError("No such file :", self.source_path)
 
@@ -26,10 +25,10 @@ class WordUtils(object):
 
 
 class ExcelUtils(object):
-    def __init__(self):
-        self.output_file = cs.excel_file_path
+    def __init__(self, question_file_path):
+        self.output_file = question_file_path
 
-    def writer(self, data: dict, columns: list):
+    def writer(self, data: dict, columns=cs.column_titles):
         df = pd.DataFrame(data=data, columns=columns)
         with pd.ExcelWriter(self.output_file) as writer:
             df.to_excel(writer)
