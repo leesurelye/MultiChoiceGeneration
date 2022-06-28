@@ -11,7 +11,7 @@ except:
 import codecs
 from textrank4zh import TextRank4Keyword
 
-text = codecs.open('./doc/02.txt', 'r', 'utf-8').read()
+text = codecs.open('../../doc/02.txt', 'r', 'utf-8').read()
 # text = "世界的美好。世界美国英国。 世界和平。"
 
 tr4w = TextRank4Keyword()
