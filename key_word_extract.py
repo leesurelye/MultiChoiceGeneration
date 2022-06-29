@@ -4,7 +4,6 @@
 import os
 from settings import system_setting
 from hanlp_restful import HanLPClient
-from textrank4zh import TextRank4Keyword
 from textrank4zh import util
 from textrank4zh.Segmentation import Segmentation
 
@@ -19,7 +18,6 @@ class KeyExtract(object):
         self.method = method
         self.hanlpClient = HanLPClient(system_setting.service_name, auth=system_setting.api_auth,
                                        language='zh') if self.method == 'api' else None
-        self.extract_model = TextRank4Keyword(stop_words_file=ROOT_PATH + system_setting.stop_file_path)
         self.seg = Segmentation(stop_words_file=ROOT_PATH + system_setting.stop_file_path,
                                 allow_speech_tags=allow_POS_tags,
                                 delimiters=sentence_delimiters)
@@ -42,15 +40,16 @@ class KeyExtract(object):
                      word_min_len=2):
         keywords = self.analyze(sent)
         # get phrase
-        result = []
+        key_phrases = dict()
         count = 0
         for item in keywords:
             if count >= top_k:
                 break
             if len(item.word) >= word_min_len:
-                result.append(item)
+                key_phrases[item.word] = item.weight
                 count += 1
-        return result
+        question, answer = self._write_question(sent, key_phrases)
+        return question, answer
 
     @staticmethod
     def _write_question(text: str, scores: dict, limit_blank=4):
