@@ -29,7 +29,7 @@ class KeyExtract(object):
                                 allow_speech_tags=allow_POS_tags,
                                 delimiters=sentence_delimiters)
 
-    def by_hanlp_api(self, sent: str, top_k=6):
+    def using_hanlp_api(self, sent: str, top_k=6):
         """
 
         :param sent:str
@@ -41,11 +41,11 @@ class KeyExtract(object):
         question, answer = self._write_question(sent, key_phrases)
         return question, answer
 
-    def by_text_rank(self,
+    def using_text_rank(self,
                      sent: str,
                      top_k=6,
                      word_min_len=2):
-        keywords = self.analyze(sent)
+        keywords = self._analyze(sent)
         # get phrase
         key_phrases = dict()
         count = 0
@@ -71,7 +71,7 @@ class KeyExtract(object):
             _index += 1
         return _text, answer
 
-    def analyze(self, text,
+    def _analyze(self, text,
                 window=2,
                 lower=False,
                 vertex_source='all_filters',
@@ -108,6 +108,6 @@ class KeyExtract(object):
 if __name__ == '__main__':
     key_extractor = KeyExtract()
     T = "省第十四次党代会以来的五年极不平凡，是感恩奋进、实干争先的五年，是开启系统性变革、实现历史性跨越的五年。面对百年变局和世纪疫情相互叠加的复杂局面，我们在以习近平同志为核心的党中央坚强领导下，全面落实党的十九大和十九届历次全会精神，增强“四个意识”、坚定“四个自信”、做到“两个维护”，以最真挚的感情感悟总书记殷殷嘱托，以最坚决的行动落实总书记重要指示，团结带领全省人民忠实践行“八八战略”、奋力打造“重要窗口”，坚决扛起高质量发展建设共同富裕示范区政治责任，深入实施富民强省十大行动计划，全面建设“六个浙江”，高水平全面建成小康社会，浙江发展取得了历史性成就、站上了新的更高起点。"
-    Q, A = key_extractor.by_hanlp_api(T)
+    Q, A = key_extractor.using_hanlp_api(T)
     print(Q)
     print(A)
