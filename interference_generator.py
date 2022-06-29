@@ -1,6 +1,6 @@
 # author: yue
 # datetime: 2022/6/28 21:16
-# file: similarity_calculate.py
+# file: interference_generator.py
 
 from settings import system_setting
 from gensim.models.keyedvectors import KeyedVectors
@@ -8,6 +8,7 @@ from gensim.models.keyedvectors import KeyedVectors
 
 class SimilarCalculate(object):
     def __init__(self):
+        # TODO loading this model may take a lot of time
         print("[*] Loading model... [it may take a while, about 3 minutes]")
         self.w2v_model = KeyedVectors.load_word2vec_format(system_setting.chinese_word_vector,
                                                            binary=False,
@@ -30,6 +31,8 @@ class SimilarCalculate(object):
         if len(res) == 0:
             return [x for x, w in results if w >= threshold]
         return res
+
+
 
 
 if __name__ == "__main__":

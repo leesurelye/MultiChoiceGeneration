@@ -5,7 +5,7 @@
 
 parsing_path = "/doc/.output/file.txt"
 # hanlp_api_auth
-api_auth = "api_auth = MTIyMEBiYnMuaGFubHAuY29tOnpJOU9JcTczWjAyUUZhOGw="
+api_auth = "MTIyMEBiYnMuaGFubHAuY29tOnpJOU9JcTczWjAyUUZhOGw="
 # key extract server name
 service_name = "https://www.hanlp.com/api"
 # config for word embedding

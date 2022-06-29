@@ -14,10 +14,17 @@ allow_POS_tags = ['an', 'i', 'j', 'l', 'n', 'nr', 'nrfg', 'ns', 'nt', 'nz', 't',
 
 
 class KeyExtract(object):
-    def __init__(self, method="api"):
-        self.method = method
-        self.hanlpClient = HanLPClient(system_setting.service_name, auth=system_setting.api_auth,
-                                       language='zh') if self.method == 'api' else None
+    """
+        关键词抽取类：一共有两个实现方法
+            方法一：使用Hanlp API工具
+            方法二：使用TextRank算法
+
+    """
+    def __init__(self):
+        self.hanlpClient = HanLPClient(system_setting.service_name,
+                                       auth=system_setting.api_auth,
+                                       language='zh')
+
         self.seg = Segmentation(stop_words_file=ROOT_PATH + system_setting.stop_file_path,
                                 allow_speech_tags=allow_POS_tags,
                                 delimiters=sentence_delimiters)
@@ -25,8 +32,8 @@ class KeyExtract(object):
     def by_hanlp_api(self, sent: str, top_k=6):
         """
 
-        :param sent:
-        :param top_k:
+        :param sent:str
+        :param top_k:int,
         :return: question: [str] the sentence that black out by the key phrase
                  answer: [list],
         """
@@ -53,15 +60,16 @@ class KeyExtract(object):
 
     @staticmethod
     def _write_question(text: str, scores: dict, limit_blank=4):
-        index = 1
+        _index = 1
         answer = list()
+        _text = text
         for k, v in scores.items():
-            text = text.replace(k, '__[{index}]__'.format(index=index))
-            index += 1
-            answer.append({index: k})
-            if index == limit_blank:
+            _text = _text.replace(k, '__[{index}]__'.format(index=_index))
+            answer.append({_index: k})
+            if _index > limit_blank - 1:
                 break
-        return text, answer
+            _index += 1
+        return _text, answer
 
     def analyze(self, text,
                 window=2,
@@ -94,3 +102,12 @@ class KeyExtract(object):
             _edge_source = result['words_no_stop_words']
 
         return util.sort_words(_vertex_source, _edge_source, window=window)
+
+
+# unite test
+if __name__ == '__main__':
+    key_extractor = KeyExtract()
+    T = "省第十四次党代会以来的五年极不平凡，是感恩奋进、实干争先的五年，是开启系统性变革、实现历史性跨越的五年。面对百年变局和世纪疫情相互叠加的复杂局面，我们在以习近平同志为核心的党中央坚强领导下，全面落实党的十九大和十九届历次全会精神，增强“四个意识”、坚定“四个自信”、做到“两个维护”，以最真挚的感情感悟总书记殷殷嘱托，以最坚决的行动落实总书记重要指示，团结带领全省人民忠实践行“八八战略”、奋力打造“重要窗口”，坚决扛起高质量发展建设共同富裕示范区政治责任，深入实施富民强省十大行动计划，全面建设“六个浙江”，高水平全面建成小康社会，浙江发展取得了历史性成就、站上了新的更高起点。"
+    Q, A = key_extractor.by_hanlp_api(T)
+    print(Q)
+    print(A)
