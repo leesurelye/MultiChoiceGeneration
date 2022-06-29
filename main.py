@@ -21,13 +21,14 @@ class MultiChoiceGenerator(object):
         self.config = generated_mode
         self.min_len = customer_setting.min_question_length
         self.sentences = None
+        self.word_utils = WordUtils(ROOT_PATH + customer_setting.word_file_path,
+                                    ROOT_PATH + system_setting.parsing_path)
         if not os.path.exists(system_setting.parsing_path):
             self._processed_word_file()
         self.__load_sentence()
         self.processed_file = system_setting.parsing_path
 
-        self.word_utils = WordUtils(ROOT_PATH + customer_setting.word_file_path,
-                                    ROOT_PATH + system_setting.parsing_path)
+
         self.excel_utils = ExcelUtils(ROOT_PATH + customer_setting.excel_file_path)
         self.question_writer = KeyExtract()
         self.choice_writer = SimilarCalculate()
