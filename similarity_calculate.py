@@ -2,22 +2,39 @@
 # datetime: 2022/6/28 21:16
 # file: similarity_calculate.py
 
-from settings import default_setting as ds
+from settings import system_setting
 from gensim.models.keyedvectors import KeyedVectors
 
 
 class SimilarCalculate(object):
     def __init__(self):
-        self.w2v_model = KeyedVectors.load_word2vec_format(ds.chinese_word_vector,
+        print("[*] Loading model... [it may take a while, about 3 minutes]")
+        self.w2v_model = KeyedVectors.load_word2vec_format(system_setting.chinese_word_vector,
                                                            binary=False,
                                                            unicode_errors='ignore')
+        print("[*] Load finished!")
 
-    def most_similar(self, word: str):
-        results = self.w2v_model.similar_by_word(word)
-        for word in results:
-            print(word)
+    def most_similar(self, word: str, top_k=10, threshold=0.5) -> list:
+        """
+        given a word and calculate the most similar word in this directory
+        :param word:
+        :param top_k:
+        :param threshold:
+        :return:
+        """
+        results = self.w2v_model.similar_by_word(word, top_k)
+        res = list()
+        for s_word, weight in results:
+            if len(word) == len(s_word):
+                res.append(s_word)
+        if len(res) == 0:
+            return [x for x, w in results if w >= threshold]
+        return res
 
 
 if __name__ == "__main__":
     calculator = SimilarCalculate()
-    calculator.most_similar("八八战略")
+    while True:
+        print("input:")
+        text = input()
+        calculator.most_similar(text)

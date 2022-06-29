@@ -1,7 +1,6 @@
 # -*- encoding:utf-8 -*-
 import codecs
 from textrank4zh import TextRank4Keyword, TextRank4Sentence
-from settings import default_setting as ds
 
 # just for test
 if __name__ == '__main__':
