@@ -15,10 +15,11 @@ class SimilarCalculate(object):
                                                            unicode_errors='ignore')
         print("[*] Load finished!")
 
-    def most_similar(self, word: str, top_k=10, threshold=0.5) -> list:
+    def most_similar(self, word: str, limit=3, top_k=10, threshold=0.5) -> list:
         """
         given a word and calculate the most similar word in this directory
         :param word:
+        :param limit:
         :param top_k:
         :param threshold:
         :return:
@@ -28,6 +29,8 @@ class SimilarCalculate(object):
         for s_word, weight in results:
             if len(word) == len(s_word):
                 res.append(s_word)
+            if len(res) == limit:
+                return res
         if len(res) == 0:
             return [x for x, w in results if w >= threshold]
         return res

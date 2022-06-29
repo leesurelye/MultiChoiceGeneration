@@ -30,28 +30,26 @@ class KeyExtract(object):
                                 allow_speech_tags=allow_POS_tags,
                                 delimiters=sentence_delimiters)
 
-    def using_hanlp_api(self, sent: str, top_k=6):
+    def using_hanlp_api(self, sent: str, top_k=6, limit_blank=4):
         """
 
         :param sent:str
         :param top_k:int,
+        :param limit_blank: 控制产生空格的个数
         :return: question: [str] the sentence that black out by the key phrase
                  answer: [list],
         """
         key_phrases = self.hanlpClient.keyphrase_extraction(sent, topk=top_k)
-        question, answer = self._write_question(sent, key_phrases)
+        question, answer = self._write_question(sent, key_phrases, limit_blank=limit_blank)
         return question, answer
 
-    def using_text_rank(self,
-                        sent: str,
-                        top_k=6,
-                        word_min_len=2):
+    def using_text_rank(self, sent: str, top_k=6, limit_blank=4, word_min_len=2):
         keywords = self._analyze(sent)
         # get phrase
         key_phrases = dict()
         count = 0
         for item in keywords:
-            if count >= top_k:
+            if count >= limit_blank:
                 break
             if len(item.word) >= word_min_len:
                 key_phrases[item.word] = item.weight
@@ -62,18 +60,18 @@ class KeyExtract(object):
     @staticmethod
     def _write_question(text: str, scores: dict, limit_blank=4):
         _index = 1
-        answer = list()
+        answer = dict()
         _text = text
         for k, v in scores.items():
-            _text = _text.replace(k, '__[{index}]__'.format(index=_index))
-            answer.append({_index: k})
+            _text = _text.replace(k, '__[{index}]__'.format(index=_index), 1)
+            answer[_index] = k
             if _index > limit_blank - 1:
                 break
             _index += 1
         return _text, answer
 
     def _analyze(self, text,
-                 window=2,
+                 window=4,
                  lower=False,
                  vertex_source='all_filters',
                  edge_source='no_stop_words'):
