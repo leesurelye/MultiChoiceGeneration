@@ -20,12 +20,13 @@ class KeyExtract(object):
             方法二：使用TextRank算法
 
     """
+
     def __init__(self):
         self.hanlpClient = HanLPClient(system_setting.service_name,
                                        auth=system_setting.api_auth,
                                        language='zh')
 
-        self.seg = Segmentation(stop_words_file=ROOT_PATH + system_setting.stop_file_path,
+        self.seg = Segmentation(stop_words_file=system_setting.stop_file_path,
                                 allow_speech_tags=allow_POS_tags,
                                 delimiters=sentence_delimiters)
 
@@ -42,9 +43,9 @@ class KeyExtract(object):
         return question, answer
 
     def using_text_rank(self,
-                     sent: str,
-                     top_k=6,
-                     word_min_len=2):
+                        sent: str,
+                        top_k=6,
+                        word_min_len=2):
         keywords = self._analyze(sent)
         # get phrase
         key_phrases = dict()
@@ -72,10 +73,10 @@ class KeyExtract(object):
         return _text, answer
 
     def _analyze(self, text,
-                window=2,
-                lower=False,
-                vertex_source='all_filters',
-                edge_source='no_stop_words'):
+                 window=2,
+                 lower=False,
+                 vertex_source='all_filters',
+                 edge_source='no_stop_words'):
         """分析文本
 
         Keyword arguments:

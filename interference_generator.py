@@ -9,7 +9,7 @@ from gensim.models.keyedvectors import KeyedVectors
 class SimilarCalculate(object):
     def __init__(self):
         # TODO loading this model may take a lot of time
-        print("[*] Loading model... [it may take a while, about 3 minutes]")
+        print("[*] Loading word to vector model... [it may take a while, about 3 minutes]")
         self.w2v_model = KeyedVectors.load_word2vec_format(system_setting.chinese_word_vector,
                                                            binary=False,
                                                            unicode_errors='ignore')
