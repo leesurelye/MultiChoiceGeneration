@@ -4,3 +4,4 @@ doc
 .idea
 settings/system_setting.py
 __pycache__
+result/*
