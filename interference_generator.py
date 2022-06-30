@@ -4,7 +4,6 @@
 
 from settings import system_setting
 from gensim.models.keyedvectors import KeyedVectors
-import jieba
 
 
 class SimilarCalculate(object):
@@ -42,9 +41,9 @@ class SimilarCalculate(object):
         return res
 
 
-if __name__ == "__main__":
-    calculator = SimilarCalculate()
-    while True:
-        print("input:")
-        text = input()
-        calculator.most_similar(text)
+# if __name__ == "__main__":
+#     calculator = SimilarCalculate()
+#     while True:
+#         print("input:")
+#         text = input()
+#         calculator.most_similar(text)

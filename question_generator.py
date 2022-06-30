@@ -85,7 +85,7 @@ class MultiChoiceGenerator(object):
         if sentences is None:
             sentences = self.sentences
         for sent in tqdm(sentences,
-                         desc="[Writer Questions] type={type}:".format(type=limit_blank)):
+                         desc="[Writer Questions] type={type}".format(type=limit_blank)):
             if self.algorithm == 'text-rank':
                 questions, answers, candidates = self.question_writer.using_text_rank(sent, limit_blank=limit_blank)
             elif self.algorithm == 'tf-idf':
@@ -104,6 +104,8 @@ class MultiChoiceGenerator(object):
             for error in interference:
                 choice[index] = error
                 index += 1
+                if index == 4:
+                    break
             data.append([questions, str(choice), str(answers)])
             if self.algorithm == 'hanlp':
                 time.sleep(2)
@@ -123,8 +125,9 @@ class MultiChoiceGenerator(object):
         offset = 0
         total = list()
         for i in range(len(scales)):
-            start, end = offset, offset + int(n * scales[0])
+            start, end = offset, offset + int(n * scales[i])
             data = self.sentences[start:end]
             tmp = self.__write(sentences=data, limit_blank=i + 1)
             total.extend(tmp)
+            offset = end
         self.__dump_question(total)

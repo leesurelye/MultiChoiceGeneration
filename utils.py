@@ -32,8 +32,8 @@ class ExcelUtils(object):
             df.to_excel(writer)
 
 
-# unit test
-if __name__ == '__main__':
-    test_data = {"a": "b", "b": "c"}
-    utils = ExcelUtils(test_data)
-    print("Done!")
+# # unit test
+# if __name__ == '__main__':
+#     test_data = {"a": "b", "b": "c"}
+#     utils = ExcelUtils(test_data)
+#     print("Done!")

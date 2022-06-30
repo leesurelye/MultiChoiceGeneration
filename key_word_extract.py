@@ -75,12 +75,31 @@ class KeyExtract(object):
         _text = text
         for k, v in scores.items():
             if _index < limit_blank:
-                _text = _text.replace(k, '__[{index}]__'.format(index=_index + 1), 1)
+                _text = _text.replace(k, '#{index}'.format(index=_index + 1), 1)
                 answer[_index] = k
             else:
                 remain.append(k)
             _index += 1
+        _text, answer = KeyExtract.__beautify(_text, answer)
         return _text, answer, remain
+
+    @staticmethod
+    def __beautify(text: str, answer: dict):
+        mapping = {}
+        index = 1
+        while True:
+            blank_index = text.find('#')
+            if blank_index == -1:
+                break
+            slot = text[blank_index: blank_index + 1]
+            mapping[int(text[blank_index + 1])] = index
+            text = text.replace(slot, '__[{i}]__'.format(i=index))
+            index += 1
+        _corrected_ = dict()
+        for k, v in answer.items():
+            _corrected_[mapping[k]] = v
+
+        return text, _corrected_
 
     def _analyze(self, text,
                  window=4,
