@@ -16,6 +16,7 @@ max_question_length = 200
 filter_question_length = 30
 # 生成表格的标题
 column_titles = ["问题题干", "选项", "答案"]
-#
+# full_choice num
+
 
 

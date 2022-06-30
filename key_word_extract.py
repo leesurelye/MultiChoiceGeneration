@@ -5,12 +5,14 @@ import os
 from settings import system_setting
 from hanlp_restful import HanLPClient
 from textrank4zh import util
+import jieba
+import jieba.analyse
 from textrank4zh.Segmentation import Segmentation
 
 ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 sentence_delimiters = ['?', '!', ';', '？', '！', '。', '；', '……', '…', '\n']
-allow_POS_tags = ['an', 'i', 'j', 'l', 'n', 'nr', 'nrfg', 'ns', 'nt', 'nz', 't', 'v', 'vd', 'vn', 'eng']
+allow_POS_tags = ['an', 'i', 'j', 'l', 'n', 'nr', 'nrfg', 'ns', 'nt', 'nz', 't']
 
 
 class KeyExtract(object):
@@ -41,7 +43,15 @@ class KeyExtract(object):
         """
         key_phrases = self.hanlpClient.keyphrase_extraction(sent, topk=top_k)
         question, answer, remain = self._write_question(sent, key_phrases, limit_blank=limit_blank)
-        return question, answer, key_phrases
+        return question, answer, remain
+
+    def using_tf_idf(self, sen: str, top_k=8, limit_blank=4, word_min_len=2):
+        words = jieba.analyse.extract_tags(sen, topK=top_k, withWeight=True)
+        key_phrase = dict()
+        for k, v in words:
+            key_phrase[k] = v
+        question, answer, remain = self._write_question(sen, key_phrase, limit_blank=limit_blank)
+        return question, answer, remain
 
     def using_text_rank(self, sent: str, top_k=8, limit_blank=4, word_min_len=2):
         keywords = self._analyze(sent)
@@ -51,11 +61,9 @@ class KeyExtract(object):
         for item in keywords:
             if count >= limit_blank:
                 break
-            if len(item.word) >= word_min_len:
-                key_phrases[item.word] = item.weight
-                count += 1
-        if count < top_k:
-            key_phrases = keywords
+            # if len(item.word) >= word_min_len:
+            key_phrases[item.word] = item.weight
+            count += 1
         question, answer, remain = self._write_question(sent, key_phrases)
         return question, answer, remain
 

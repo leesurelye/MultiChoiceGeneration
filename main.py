@@ -5,6 +5,9 @@
 # the main function for this project
 import time
 import random
+
+import jieba.analyse
+
 from settings import system_setting
 from settings import customer_setting
 from utils import WordUtils, ExcelUtils
@@ -13,15 +16,16 @@ from key_word_extract import KeyExtract
 import os
 import sys
 from tqdm import tqdm
-import jieba
 
 #  注意： 该项目不要安装在以中文命名的目录下
 sys.path.append(os.getcwd())
 
 
 class MultiChoiceGenerator(object):
-    def __init__(self, algorithm='text_rank'):
+    def __init__(self, algorithm='text-rank'):
         self.algorithm = algorithm
+        if self.algorithm not in ['api', 'tf-idf', 'text-rank']:
+            raise KeyError("algorithm key error {error}".format(error=algorithm))
         self.min_len = customer_setting.min_question_length
         self.sentences = None
         self.word_utils = WordUtils(customer_setting.word_file_path,
@@ -79,10 +83,14 @@ class MultiChoiceGenerator(object):
     def write(self, limit_blank=4):
         data = list()
         for sent in tqdm(self.sentences, desc="[Writer Questions]:"):
-            if self.algorithm == 'text_rank':
+            if self.algorithm == 'text-rank':
                 questions, answers, candidates = self.question_writer.using_text_rank(sent, limit_blank=limit_blank)
-            else:
+            elif self.algorithm == 'tf-idf':
+                questions, answers, candidates = self.question_writer.using_tf_idf(sent, limit_blank=limit_blank)
+            elif self.algorithm == 'api':
                 questions, answers, candidates = self.question_writer.using_hanlp_api(sent, limit_blank=limit_blank)
+            else:
+                raise KeyError("algorithm key error! {error}".format(error=self.algorithm))
             _index = random.randint(0, len(answers) - 1)
             choice = answers.copy()
             interference = self.choice_writer.most_similar(answers[_index], limit=4 - limit_blank)
@@ -112,6 +120,9 @@ class MultiChoiceGenerator(object):
 
 
 if __name__ == '__main__':
-    generator = MultiChoiceGenerator()
-    generator.lack_mode()
+    # system initial code
+    jieba.analyse.set_stop_words(system_setting.stop_file_path)
+    generator = MultiChoiceGenerator(algorithm='tf-idf')
+    generator.single_mode()
+    print("Done!")
     # print(generator.sentences)
