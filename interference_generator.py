@@ -4,6 +4,7 @@
 
 from settings import system_setting
 from gensim.models.keyedvectors import KeyedVectors
+import jieba
 
 
 class SimilarCalculate(object):
@@ -22,19 +23,22 @@ class SimilarCalculate(object):
         :param limit:
         :param top_k:
         :param threshold:
-        :return:
+        :return: list
         """
         if limit == 0:
             return list()
-        results = self.w2v_model.similar_by_word(word, top_k)
+        try:
+            similarity = self.w2v_model.most_similar(negative=[word], topn=top_k)
+        except KeyError:
+            return list()
         res = list()
-        for s_word, weight in results:
+        for s_word, weight in similarity:
             if len(word) == len(s_word):
                 res.append(s_word)
             if len(res) == limit:
                 return res
         if len(res) == 0:
-            return [x for x, w in results if w >= threshold]
+            return [x for x, w in similarity if w >= threshold]
         return res
 
 

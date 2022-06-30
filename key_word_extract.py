@@ -30,7 +30,7 @@ class KeyExtract(object):
                                 allow_speech_tags=allow_POS_tags,
                                 delimiters=sentence_delimiters)
 
-    def using_hanlp_api(self, sent: str, top_k=6, limit_blank=4):
+    def using_hanlp_api(self, sent: str, top_k=8, limit_blank=4):
         """
 
         :param sent:str
@@ -40,10 +40,10 @@ class KeyExtract(object):
                  answer: [list],
         """
         key_phrases = self.hanlpClient.keyphrase_extraction(sent, topk=top_k)
-        question, answer = self._write_question(sent, key_phrases, limit_blank=limit_blank)
-        return question, answer
+        question, answer, remain = self._write_question(sent, key_phrases, limit_blank=limit_blank)
+        return question, answer, key_phrases
 
-    def using_text_rank(self, sent: str, top_k=6, limit_blank=4, word_min_len=2):
+    def using_text_rank(self, sent: str, top_k=8, limit_blank=4, word_min_len=2):
         keywords = self._analyze(sent)
         # get phrase
         key_phrases = dict()
@@ -54,21 +54,25 @@ class KeyExtract(object):
             if len(item.word) >= word_min_len:
                 key_phrases[item.word] = item.weight
                 count += 1
-        question, answer = self._write_question(sent, key_phrases)
-        return question, answer
+        if count < top_k:
+            key_phrases = keywords
+        question, answer, remain = self._write_question(sent, key_phrases)
+        return question, answer, remain
 
     @staticmethod
     def _write_question(text: str, scores: dict, limit_blank=4):
         _index = 0
         answer = dict()
+        remain = list()
         _text = text
         for k, v in scores.items():
-            _text = _text.replace(k, '__[{index}]__'.format(index=_index), 1)
-            answer[_index] = k
-            if _index > limit_blank:
-                break
+            if _index < limit_blank:
+                _text = _text.replace(k, '__[{index}]__'.format(index=_index + 1), 1)
+                answer[_index] = k
+            else:
+                remain.append(k)
             _index += 1
-        return _text, answer
+        return _text, answer, remain
 
     def _analyze(self, text,
                  window=4,
@@ -104,9 +108,8 @@ class KeyExtract(object):
 
 
 # unite test
-if __name__ == '__main__':
-    key_extractor = KeyExtract()
-    T = "省第十四次党代会以来的五年极不平凡，是感恩奋进、实干争先的五年，是开启系统性变革、实现历史性跨越的五年。面对百年变局和世纪疫情相互叠加的复杂局面，我们在以习近平同志为核心的党中央坚强领导下，全面落实党的十九大和十九届历次全会精神，增强“四个意识”、坚定“四个自信”、做到“两个维护”，以最真挚的感情感悟总书记殷殷嘱托，以最坚决的行动落实总书记重要指示，团结带领全省人民忠实践行“八八战略”、奋力打造“重要窗口”，坚决扛起高质量发展建设共同富裕示范区政治责任，深入实施富民强省十大行动计划，全面建设“六个浙江”，高水平全面建成小康社会，浙江发展取得了历史性成就、站上了新的更高起点。"
-    Q, A = key_extractor.using_hanlp_api(T)
-    print(Q)
-    print(A)
+# if __name__ == '__main__':
+#     key_extractor = KeyExtract()
+#     Q, A = key_extractor.using_hanlp_api(T)
+#     print(Q)
+#     print(A)

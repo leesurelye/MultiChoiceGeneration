@@ -80,14 +80,19 @@ class MultiChoiceGenerator(object):
         data = list()
         for sent in tqdm(self.sentences, desc="[Writer Questions]:"):
             if self.algorithm == 'text_rank':
-                questions, answers = self.question_writer.using_text_rank(sent, limit_blank=limit_blank)
+                questions, answers, candidates = self.question_writer.using_text_rank(sent, limit_blank=limit_blank)
             else:
-                questions, answers = self.question_writer.using_hanlp_api(sent, limit_blank=limit_blank)
+                questions, answers, candidates = self.question_writer.using_hanlp_api(sent, limit_blank=limit_blank)
             _index = random.randint(0, len(answers) - 1)
             choice = answers.copy()
             interference = self.choice_writer.most_similar(answers[_index], limit=4 - limit_blank)
-            for i in range(len(answers), 4):
-                choice[i] = interference[i]
+            # if there is no similar word, chose one from key phrase
+            index = len(answers)
+            if len(interference) == 0:
+                interference = candidates
+            for error in interference:
+                choice[index] = error
+                index += 1
             data.append([questions, str(choice), str(answers)])
             if self.algorithm == 'hanlp':
                 time.sleep(2)
@@ -108,5 +113,5 @@ class MultiChoiceGenerator(object):
 
 if __name__ == '__main__':
     generator = MultiChoiceGenerator()
-    generator.full_mode()
+    generator.lack_mode()
     # print(generator.sentences)
