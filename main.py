@@ -16,6 +16,9 @@ from key_word_extract import KeyExtract
 import os
 import sys
 from tqdm import tqdm
+# jieba 配置
+jieba.analyse.set_stop_words(system_setting.stop_file_path)
+jieba.load_userdict(system_setting.user_dict_path)
 
 #  注意： 该项目不要安装在以中文命名的目录下
 sys.path.append(os.getcwd())
@@ -121,8 +124,9 @@ class MultiChoiceGenerator(object):
 
 if __name__ == '__main__':
     # system initial code
-    jieba.analyse.set_stop_words(system_setting.stop_file_path)
+
     generator = MultiChoiceGenerator(algorithm='tf-idf')
     generator.single_mode()
     print("Done!")
+    jieba.analyse.TFIDF
     # print(generator.sentences)
