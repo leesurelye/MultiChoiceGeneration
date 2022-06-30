@@ -16,6 +16,7 @@ max_question_length = 200
 filter_question_length = 30
 # 生成表格的标题
 columns = ["题干", "选项A", "选项B", "选项C", "选项D", "正确选项1", "正确选项2", "正确选项3", "正确选项4"]
-columns_without_type = ["问题题干", "选项", "答案"]
+sheets = ['4选1', '4选2', '4选3', '4选4']
+default_columns = ["问题题干", "选项", "答案"]
 # 生成问题的比列, 从左到右依次是，4选1, 4选2, 4选3, 4选4占比
 type_scale = [0.4, 0.2, 0.2, 0.2]

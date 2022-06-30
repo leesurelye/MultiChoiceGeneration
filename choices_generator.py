@@ -1,6 +1,6 @@
 # author: yue
 # datetime: 2022/6/28 21:16
-# file: interference_generator.py
+# file: choices_generator.py
 
 from settings import system_setting
 from gensim.models.keyedvectors import KeyedVectors

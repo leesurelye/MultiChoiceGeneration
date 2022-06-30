@@ -6,7 +6,7 @@ import random
 from settings import system_setting
 from settings import user_setting
 from utils import WordUtils, ExcelUtils
-from interference_generator import SimilarCalculate
+from choices_generator import SimilarCalculate
 from key_word_extract import KeyExtract
 import os
 from tqdm import tqdm
@@ -14,6 +14,7 @@ from tqdm import tqdm
 
 class MultiChoiceGenerator(object):
     def __init__(self, algorithm='text-rank'):
+        self.__mapping__ = {1: 'A', 2: 'B', 3: 'C', 4: 'D'}
         self.algorithm = algorithm
         if self.algorithm not in ['api', 'tf-idf', 'text-rank']:
             raise KeyError("algorithm key error {error}".format(error=algorithm))
@@ -111,13 +112,23 @@ class MultiChoiceGenerator(object):
                 time.sleep(2)
         return data
 
-    def __dump_question(self, data: list, with_question_type=False):
+    def __dump_question(self, data: list, style='default'):
         if os.path.exists(user_setting.excel_file_path):
             os.remove(user_setting.excel_file_path)
-        if with_question_type:
-            self.excel_utils.writer(data, columns=user_setting.columns)
+        if style == 'default':
+            self.excel_utils.writer(data, columns=user_setting.default_columns)
         else:
-            self.excel_utils.writer(data, columns=user_setting.columns_without_type)
+            new_data = list()
+            for question, choice, answer in data:
+                new_row = [''] * 9
+                new_row[0] = question
+                for i in range(1, 5):
+                    new_row[i] = choice.get(i, '')
+                for i in range(5, 9):
+                    if i - 4 in answer:
+                        new_row[i] = self.__mapping__[i - 4]
+                new_data.append(new_row)
+            self.excel_utils.writer(new_data, columns=user_setting.columns)
 
     def composite_mode(self, scales=user_setting.type_scale):
         """ 综合模式 """

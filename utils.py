@@ -29,7 +29,7 @@ class ExcelUtils(object):
     def writer(self, data: list, columns: list):
         df = pd.DataFrame(data=data, columns=columns)
         with pd.ExcelWriter(self.output_file) as writer:
-            df.to_excel(writer)
+            df.to_excel(writer, index_label='序号')
 
 
 # # unit test
