@@ -75,23 +75,23 @@ class KeyExtract(object):
         _text = text
         for k, v in scores.items():
             if _index < limit_blank:
-                _text = _text.replace(k, '#{index}'.format(index=_index + 1), 1)
+                _text = _text.replace(k, '#{index}'.format(index=_index), 1)
                 answer[_index] = k
             else:
                 remain.append(k)
             _index += 1
-        _text, answer = KeyExtract.__beautify(_text, answer)
+        _text, answer = KeyExtract._beautify(_text, answer)
         return _text, answer, remain
 
     @staticmethod
-    def __beautify(text: str, answer: dict):
+    def _beautify(text: str, answer: dict):
         mapping = {}
         index = 1
         while True:
             blank_index = text.find('#')
             if blank_index == -1:
                 break
-            slot = text[blank_index: blank_index + 1]
+            slot = text[blank_index: blank_index + 2]
             mapping[int(text[blank_index + 1])] = index
             text = text.replace(slot, '__[{i}]__'.format(i=index))
             index += 1
@@ -137,6 +137,7 @@ class KeyExtract(object):
 # unite test
 # if __name__ == '__main__':
 #     key_extractor = KeyExtract()
-#     Q, A = key_extractor.using_hanlp_api(T)
+#     text = "#2大抓#0鲜明导向，全面加强基层党组织和书记队伍建设，深化“导师#1制”，更好发挥党员先锋模范作用，推动基层党建全省域建强、全领域过硬、全面走在前列"
+#     Q, A = KeyExtract._beautify(text, {0: '基层', 1: '帮带', 2: '树牢'})
 #     print(Q)
 #     print(A)

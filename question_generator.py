@@ -94,7 +94,7 @@ class MultiChoiceGenerator(object):
                 questions, answers, candidates = self.question_writer.using_hanlp_api(sent, limit_blank=limit_blank)
             else:
                 raise KeyError("algorithm key error! {error}".format(error=self.algorithm))
-            _index = random.randint(0, len(answers) - 1)
+            _index = random.randint(1, len(answers))
             choice = answers.copy()
             interference = self.choice_writer.most_similar(answers[_index], limit=4 - limit_blank)
             # if there is no similar word, chose one from key phrase

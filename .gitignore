@@ -1,6 +1,5 @@
 doc
 .model
-.config
 .idea
 settings/system_setting.py
 __pycache__
