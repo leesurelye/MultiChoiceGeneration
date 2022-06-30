@@ -5,7 +5,6 @@
 import os
 from docx import Document
 import pandas as pd
-from settings import customer_setting as cs
 
 
 class WordUtils(object):
@@ -27,7 +26,7 @@ class ExcelUtils(object):
     def __init__(self, question_file_path):
         self.output_file = question_file_path
 
-    def writer(self, data: list, columns=cs.column_titles):
+    def writer(self, data: list, columns: list):
         df = pd.DataFrame(data=data, columns=columns)
         with pd.ExcelWriter(self.output_file) as writer:
             df.to_excel(writer)

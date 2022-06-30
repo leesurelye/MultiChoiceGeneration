@@ -9,13 +9,14 @@ import random
 import jieba.analyse
 
 from settings import system_setting
-from settings import customer_setting
+from settings import user_setting
 from utils import WordUtils, ExcelUtils
 from interference_generator import SimilarCalculate
 from key_word_extract import KeyExtract
 import os
 import sys
 from tqdm import tqdm
+
 # jieba 配置
 jieba.analyse.set_stop_words(system_setting.stop_file_path)
 jieba.load_userdict(system_setting.user_dict_path)
@@ -29,17 +30,16 @@ class MultiChoiceGenerator(object):
         self.algorithm = algorithm
         if self.algorithm not in ['api', 'tf-idf', 'text-rank']:
             raise KeyError("algorithm key error {error}".format(error=algorithm))
-        self.min_len = customer_setting.min_question_length
+        self.min_len = user_setting.min_question_length
         self.sentences = None
-        self.word_utils = WordUtils(customer_setting.word_file_path,
+        self.word_utils = WordUtils(user_setting.word_file_path,
                                     system_setting.parsing_path)
         self.processed_file = system_setting.parsing_path
 
-        self.excel_utils = ExcelUtils(customer_setting.excel_file_path)
+        self.excel_utils = ExcelUtils(user_setting.excel_file_path)
         if not os.path.exists(system_setting.parsing_path):
             self._processed_word_file()
         self.__load_sentence()
-
         self.question_writer = KeyExtract()
         self.choice_writer = SimilarCalculate()
 
@@ -51,7 +51,7 @@ class MultiChoiceGenerator(object):
 
     @staticmethod
     def __check_sentence(sent: str):
-        if customer_setting.min_question_length < len(sent):
+        if user_setting.min_question_length < len(sent):
             return True
         else:
             return False
@@ -60,11 +60,12 @@ class MultiChoiceGenerator(object):
         source_txt = open(self.processed_file, 'r', encoding='utf-8').read()
         self.sentences = list()
         for para in source_txt.split('\n'):
-            if len(para) <= customer_setting.filter_question_length:
+            if len(para) <= user_setting.filter_question_length:
                 continue
             for sentence in para.split("。"):
                 if self.__check_sentence(sentence):
                     self.sentences.append(sentence)
+        print("[*] Total question length: {length}".format(length=len(self.sentences)))
 
     def full_mode(self):
         """
@@ -73,7 +74,15 @@ class MultiChoiceGenerator(object):
         """
         if self.sentences is None:
             self.__load_sentence()
-        self.write()
+        self.__write()
+
+    def single_mode(self):
+        """
+        单项选择: 4选1
+        :return:
+        """
+        data = self.__write(limit_blank=1)
+        self.__dump_question(data)
 
     def lack_mode(self):
         """
@@ -81,11 +90,15 @@ class MultiChoiceGenerator(object):
         系统随机生成4选2的多选，或者4选3的多选
         :return:
         """
-        self.write(3)
+        data = self.__write(3)
+        self.__dump_question(data)
 
-    def write(self, limit_blank=4):
+    def __write(self, sentences=None, limit_blank=4):
         data = list()
-        for sent in tqdm(self.sentences, desc="[Writer Questions]:"):
+        if sentences is None:
+            sentences = self.sentences
+        for sent in tqdm(sentences,
+                         desc="[Writer Questions] type={type}:".format(type=limit_blank)):
             if self.algorithm == 'text-rank':
                 questions, answers, candidates = self.question_writer.using_text_rank(sent, limit_blank=limit_blank)
             elif self.algorithm == 'tf-idf':
@@ -107,26 +120,32 @@ class MultiChoiceGenerator(object):
             data.append([questions, str(choice), str(answers)])
             if self.algorithm == 'hanlp':
                 time.sleep(2)
-        self.__dump_question(data)
+        return data
 
-    def single_mode(self):
-        """
-        单项选择: 4选1
-        :return:
-        """
-        self.write(limit_blank=1)
+    def __dump_question(self, data: list, with_question_type=False):
+        if os.path.exists(user_setting.excel_file_path):
+            os.remove(user_setting.excel_file_path)
+        if with_question_type:
+            self.excel_utils.writer(data, columns=user_setting.columns)
+        else:
+            self.excel_utils.writer(data, columns=user_setting.columns_without_type)
 
-    def __dump_question(self, data: list):
-        if os.path.exists(customer_setting.excel_file_path):
-            os.remove(customer_setting.excel_file_path)
-        self.excel_utils.writer(data)
+    def composite_mode(self, scales=user_setting.type_scale):
+        """ 综合模式 """
+        n = len(self.sentences)
+        offset = 0
+        total = list()
+        for i in range(len(scales)):
+            start, end = offset, offset + int(n * scales[0])
+            data = self.sentences[start:end]
+            tmp = self.__write(sentences=data, limit_blank=i + 1)
+            total.extend(tmp)
+        self.__dump_question(total)
 
 
 if __name__ == '__main__':
     # system initial code
-
     generator = MultiChoiceGenerator(algorithm='tf-idf')
-    generator.single_mode()
-    print("Done!")
-    jieba.analyse.TFIDF
+    generator.composite_mode()
+    print("Done! the output file at:", user_setting.excel_file_path)
     # print(generator.sentences)

@@ -1,6 +1,6 @@
 # author: yue
 # datetime: 2022/6/28 18:14
-# file: customer_setting.py
+# file: user_setting.py
 # encoding utf-8
 # 该文件为用户配置文件，可以按照说明修改相关配置
 
@@ -15,8 +15,10 @@ max_question_length = 200
 # 过滤标题长度
 filter_question_length = 30
 # 生成表格的标题
-column_titles = ["问题题干", "选项", "答案"]
-# full_choice num
+columns = ["问题题干", "选项", "答案", "类型"]
+columns_without_type = ["问题题干", "选项", "答案"]
+# 生成问题的比列, 从左到右依次是，4选1, 4选2, 4选3, 4选4占比
+type_scale = [0.4, 0.2, 0.2, 0.2]
 
 
 
