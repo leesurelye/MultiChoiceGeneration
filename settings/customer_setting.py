@@ -2,6 +2,7 @@
 # datetime: 2022/6/28 18:14
 # file: customer_setting.py
 # encoding utf-8
+# 该文件为用户配置文件，可以按照说明修改相关配置
 
 # 需要生成问题的原始文本，需要的文件格式为docx
 word_file_path = "C:/Users/yue/Desktop/MultiChoice/doc/浙江省第十五次党代会报告（全文）.docx"

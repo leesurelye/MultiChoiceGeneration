@@ -89,7 +89,8 @@ class MultiChoiceGenerator(object):
             for i in range(len(answers), 4):
                 choice[i] = interference[i]
             data.append([questions, str(choice), str(answers)])
-            time.sleep(2)
+            if self.algorithm == 'hanlp':
+                time.sleep(2)
         self.__dump_question(data)
 
     def single_mode(self):

@@ -59,13 +59,13 @@ class KeyExtract(object):
 
     @staticmethod
     def _write_question(text: str, scores: dict, limit_blank=4):
-        _index = 1
+        _index = 0
         answer = dict()
         _text = text
         for k, v in scores.items():
             _text = _text.replace(k, '__[{index}]__'.format(index=_index), 1)
             answer[_index] = k
-            if _index > limit_blank - 1:
+            if _index > limit_blank:
                 break
             _index += 1
         return _text, answer

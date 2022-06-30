@@ -24,6 +24,8 @@ class SimilarCalculate(object):
         :param threshold:
         :return:
         """
+        if limit == 0:
+            return list()
         results = self.w2v_model.similar_by_word(word, top_k)
         res = list()
         for s_word, weight in results:
