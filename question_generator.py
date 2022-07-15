@@ -9,12 +9,16 @@ from utils import WordUtils, ExcelUtils
 from choices_generator import SimilarCalculate
 from key_word_extract import KeyExtract
 import os
+from typing import List
 from tqdm import tqdm
+import pandas as pd
 
 
 class MultiChoiceGenerator(object):
+    __mapping__ = {1: 'A', 2: 'B', 3: 'C', 4: 'D'}
+
     def __init__(self, algorithm='text-rank'):
-        self.__mapping__ = {1: 'A', 2: 'B', 3: 'C', 4: 'D'}
+
         self.algorithm = algorithm
         if self.algorithm not in ['api', 'tf-idf', 'text-rank']:
             raise KeyError("algorithm key error {error}".format(error=algorithm))
@@ -99,46 +103,67 @@ class MultiChoiceGenerator(object):
             choice = answers.copy()
             interference = self.choice_writer.most_similar(answers[_index], limit=4 - limit_blank)
             # if there is no similar word, chose one from key phrase
-            index = len(answers)
+            index = len(answers) + 1
             if len(interference) == 0:
                 interference = candidates
             for error in interference:
                 choice[index] = error
                 index += 1
-                if index == 4:
+                if index >= 5:
                     break
-            data.append([questions, str(choice), str(answers)])
+                data.append([questions, choice, answers])
             if self.algorithm == 'hanlp':
                 time.sleep(2)
         return data
 
-    def __dump_question(self, data: list, style='default'):
+    def __dump_question(self, data: list, style='combine'):
         if os.path.exists(user_setting.excel_file_path):
             os.remove(user_setting.excel_file_path)
         if style == 'default':
             self.excel_utils.writer(data, columns=user_setting.default_columns)
+        elif style == 'combine':
+            # new_data = self.__trans_data(data)
+            self.excel_utils.writer(data, columns=user_setting.combine_columns)
         else:
-            new_data = list()
-            for question, choice, answer in data:
-                new_row = [''] * 9
+            new_data = self.__trans_data(data)
+            self.excel_utils.writer(new_data, columns=user_setting.columns)
+
+    @staticmethod
+    def __trans_data(data: list, columns: List[str]):
+        new_data = list()
+        for question, choice, answer in data:
+            new_row = [''] * len(columns)
+            if len(columns) <= 2:
+                tmp_q = question
+                for i in range(1, 5):
+                    tmp_q += '\n' + choice.get(i, '')
+                new_row[0] = tmp_q
+                ans = ''
+                for k in answer.keys():
+                    ans += MultiChoiceGenerator.__mapping__[k]
+                new_row[1] = ans
+            else:
                 new_row[0] = question
                 for i in range(1, 5):
                     new_row[i] = choice.get(i, '')
                 for i in range(5, 9):
                     if i - 4 in answer:
-                        new_row[i] = self.__mapping__[i - 4]
-                new_data.append(new_row)
-            self.excel_utils.writer(new_data, columns=user_setting.columns)
+                        new_row[i] = MultiChoiceGenerator.__mapping__[i - 4]
+            new_data.append(new_row)
+        return new_data
 
-    def composite_mode(self, scales=user_setting.type_scale):
+    def composite_mode(self, scales=user_setting.type_scale, style='combine'):
         """ 综合模式 """
         n = len(self.sentences)
         offset = 0
-        total = list()
+        writer = pd.ExcelWriter(user_setting.excel_file_path)
         for i in range(len(scales)):
             start, end = offset, offset + int(n * scales[i])
-            data = self.sentences[start:end]
-            tmp = self.__write(sentences=data, limit_blank=i + 1)
-            total.extend(tmp)
+            tmp = self.sentences[start:end]
+            data = self.__write(sentences=tmp, limit_blank=i + 1)
+            new_data = self.__trans_data(data, columns=user_setting.combine_columns)
+            df = pd.DataFrame(data=new_data, columns=user_setting.combine_columns)
+            df.to_excel(writer, index_label='序号', sheet_name=user_setting.sheets[i])
             offset = end
-        self.__dump_question(total)
+        writer.close()
+

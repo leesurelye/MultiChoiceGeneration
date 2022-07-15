@@ -18,14 +18,6 @@ sys.path.append(os.getcwd())
 
 
 if __name__ == '__main__':
-    # system initial code
-    # try:
-    #     generator = MultiChoiceGenerator(algorithm='tf-idf')
-    #     generator.composite_mode()
-    #     print("Done! the output file at:", user_setting.excel_file_path)
-    # except RuntimeError as e:
-    #     print(e)
-
     generator = MultiChoiceGenerator(algorithm='tf-idf')
     generator.composite_mode()
-    print("Done! the output file at:", user_setting.excel_file_path)
+    print("Done! The output file at:", user_setting.excel_file_path)

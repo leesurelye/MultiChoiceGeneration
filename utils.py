@@ -20,6 +20,7 @@ class WordUtils(object):
         for para in document.paragraphs:
             output_file.write(para.text)
             output_file.write("\n")
+        output_file.close()
 
 
 class ExcelUtils(object):
@@ -30,6 +31,7 @@ class ExcelUtils(object):
         df = pd.DataFrame(data=data, columns=columns)
         with pd.ExcelWriter(self.output_file) as writer:
             df.to_excel(writer, index_label='序号')
+        writer.close()
 
 
 # # unit test

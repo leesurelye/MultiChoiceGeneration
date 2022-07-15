@@ -22,7 +22,6 @@ class KeyExtract(object):
             方法二：使用TextRank算法
 
     """
-
     def __init__(self):
         self.hanlpClient = HanLPClient(system_setting.service_name,
                                        auth=system_setting.api_auth,

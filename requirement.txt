@@ -1,2 +1,2 @@
-docx == 0.2.4
+python-docx==0.8.11
 gensim == 4.2.0
