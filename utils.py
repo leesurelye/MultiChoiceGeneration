@@ -5,6 +5,7 @@
 import os
 from docx import Document
 import pandas as pd
+import heapq
 
 
 class WordUtils(object):
@@ -33,9 +34,9 @@ class ExcelUtils(object):
             df.to_excel(writer, index_label='序号')
         writer.close()
 
-
 # # unit test
 # if __name__ == '__main__':
 #     test_data = {"a": "b", "b": "c"}
 #     utils = ExcelUtils(test_data)
+#     heapq.nlargest()
 #     print("Done!")
