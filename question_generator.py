@@ -141,13 +141,14 @@ class MultiChoiceGenerator(object):
             messed_up = MultiChoiceGenerator.__mess_up_choices()
             new_row = [''] * len(columns)
             if len(columns) <= 2:
-                tmp_q = question
+                tmp_q = question+"。"
                 for i in range(1, 5):
                     tmp_q += '\n' + MultiChoiceGenerator.__mapping__[i] + '.' + choice.get(messed_up[i-1], '')
                 new_row[0] = tmp_q
                 ans = ''
                 for i in range(1, 1 + len(answer)):
-                    ans += MultiChoiceGenerator.__mapping__[messed_up[i]]
+                    answer_index = messed_up.index(i) + 1
+                    ans += MultiChoiceGenerator.__mapping__[answer_index]
                 # for k in answer.keys():
                 #     ans += MultiChoiceGenerator.__mapping__[messed_up[k]]
                 new_row[1] = ans
