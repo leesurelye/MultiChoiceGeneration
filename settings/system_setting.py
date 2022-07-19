@@ -2,9 +2,8 @@
 # this file is default setting
 # C:/Users/yue/Desktop/MultiChoice/
 # ==== please don't change this settings =====
-import sys
-import os
 
+output_dir = "doc/.output/"
 parsing_path = "doc/.output/file.txt"
 # hanlp_api_auth
 api_auth = "MTIyMEBiYnMuaGFubHAuY29tOnpJOU9JcTczWjAyUUZhOGw="

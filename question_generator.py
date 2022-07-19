@@ -29,6 +29,8 @@ class MultiChoiceGenerator(object):
         self.processed_file = system_setting.parsing_path
 
         self.excel_utils = ExcelUtils(user_setting.excel_file_path)
+        if not os.path.exists(system_setting.output_dir):
+            os.mkdir(system_setting.output_dir)
         if not os.path.exists(system_setting.parsing_path):
             self._processed_word_file()
         self.__load_sentence()
