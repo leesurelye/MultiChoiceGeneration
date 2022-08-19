@@ -190,7 +190,7 @@ class MultiChoiceGenerator(object):
             start, end = offset, offset + int(n * scales[i])
             tmp = self.sentences[start:end]
             data = self.__generate_questions(sentences=tmp, limit_blank=i + 1)
-            new_data = self.__trans_data(data, self.excel_style)
+            new_data = self.__trans_data(data)
             data.extend(new_data)
             # df = pd.DataFrame(data=new_data, columns=user_setting.combine_columns)
             # df.to_excel(writer, index_label='序号', sheet_name=user_setting.sheets[i])
