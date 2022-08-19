@@ -123,14 +123,17 @@ class MultiChoiceGenerator(object):
         random.shuffle(cur)
         return cur
 
-    @staticmethod
-    def __trans_data(data: list, columns: List[str]):
+    def __trans_data(self, data: list):
         new_data = list()
-        for question, choice, answer in data:
-            messed_up = MultiChoiceGenerator.__mess_up_choices()
-            new_row = [''] * len(columns)
-            if len(columns) <= 2:
+        columns = self.excel_style.columns
+        N = len(columns)
+        if self.excel_style.name == 'combine':
+            for question, choice, answer in data:
+                # 打乱选项
+                messed_up = MultiChoiceGenerator.__mess_up_choices()
+                new_row = [''] * N
                 tmp_q = question+"。"
+
                 for i in range(1, 5):
                     tmp_q += '\n' + MultiChoiceGenerator.__mapping__[i] + '.' + choice.get(messed_up[i-1], '')
                 new_row[0] = tmp_q
@@ -138,17 +141,38 @@ class MultiChoiceGenerator(object):
                 for i in range(1, 1 + len(answer)):
                     answer_index = messed_up.index(i) + 1
                     ans += MultiChoiceGenerator.__mapping__[answer_index]
-                # for k in answer.keys():
-                #     ans += MultiChoiceGenerator.__mapping__[messed_up[k]]
                 new_row[1] = ans
-            else:
-                new_row[0] = question
+                new_data.append(new_row)
+        elif self.excel_style.name == 'detail':
+            for question, choice, answer in data:
+                # 打乱选项
+                messed_up = MultiChoiceGenerator.__mess_up_choices()
+                new_row = [''] * N
+                tmp_q = question + "。"
+                new_row[0] = tmp_q
                 for i in range(1, 5):
-                    new_row[i] = choice.get(i, '')
+                    new_row[i] = MultiChoiceGenerator.__mapping__[i] + '.' + choice.get(messed_up[i - 1], '')
                 for i in range(5, 9):
                     if i - 4 in answer:
                         new_row[i] = MultiChoiceGenerator.__mapping__[i - 4]
-            new_data.append(new_row)
+                new_data.append(new_row)
+        elif self.excel_style.name == 'default':
+            for question, choice, answer in data:
+                # 打乱选项
+                messed_up = MultiChoiceGenerator.__mess_up_choices()
+                new_row = [''] * N
+                tmp_q = question + "。"
+                new_row[0] = tmp_q
+                choices = ''
+                for i in range(1, 5):
+                    choices += '\n' + MultiChoiceGenerator.__mapping__[i] + '.' + choice.get(messed_up[i - 1], '')
+                new_row[1] = choice
+                answers = ''
+                for i in range(1, 5):
+                    if i in answer:
+                        answers += MultiChoiceGenerator.__mapping__[i - 4] + '\n'
+                new_row[2] = answers
+                new_data.append(new_row)
         return new_data
 
     def __dump_question(self, data: list):
@@ -166,7 +190,7 @@ class MultiChoiceGenerator(object):
             start, end = offset, offset + int(n * scales[i])
             tmp = self.sentences[start:end]
             data = self.__generate_questions(sentences=tmp, limit_blank=i + 1)
-            new_data = self.__trans_data(data, columns=self.excel_style.columns)
+            new_data = self.__trans_data(data, self.excel_style)
             data.extend(new_data)
             # df = pd.DataFrame(data=new_data, columns=user_setting.combine_columns)
             # df.to_excel(writer, index_label='序号', sheet_name=user_setting.sheets[i])

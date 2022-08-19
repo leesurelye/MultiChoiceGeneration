@@ -22,10 +22,9 @@ default_style = {
 
 detail_style = {
     'name': 'detail',
-    'columns': ["题干", "选项A", "选项B", "选项C", "选项D", "正确选项1", "正确选项2", "正确选项3", "正确选项4"],
-    'sheets': ['4选1', '4选2', '4选3', '4选4']
+    'columns': ["题干", "选项A", "选项B", "选项C", "选项D", "正确选项1", "正确选项2", "正确选项3", "正确选项4"]
 }
 combine_style = {
-    'name':'combine',
+    'name': 'combine',
     'columns': ["题干", "正确选项"]
 }
