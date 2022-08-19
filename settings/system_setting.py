@@ -15,9 +15,11 @@ stop_file_path = ".config/stopwords.txt"
 user_dict_path = ".config/userdict.txt"
 restrict_vocab_size = 10000  # the total number is 25K
 key_phrase_num = 100
+# dict
 default_style = {
-    'name': 'combine',
-    'columns': ["问题题干", "选项", "答案"]
+    'name': 'default',
+    'columns': ["问题题干", "选项", "答案"],
+    'sheets': ["1", "2", "3"]
 }
 
 detail_style = {
@@ -28,3 +30,10 @@ combine_style = {
     'name': 'combine',
     'columns': ["题干", "正确选项"]
 }
+my_style = {
+    'name': 'my_style',
+    'columns': ["题干", "正确选项"]
+}
+
+# | ---|---|---|---|
+# | 题干 | 正确选项|

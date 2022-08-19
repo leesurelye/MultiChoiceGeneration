@@ -9,7 +9,6 @@ from utils import WordUtils, ExcelUtils, ExcelStyle
 from choices_generator import SimilarCalculate
 from key_word_extract import KeyExtract
 import os
-from typing import List
 from tqdm import tqdm
 
 
@@ -60,36 +59,37 @@ class MultiChoiceGenerator(object):
                     self.sentences.append(sentence)
         print("[*] Total question length: {length}".format(length=len(self.sentences)))
 
-    def full_mode(self):
-        """
-        全量模式：多选 4选4
-        :return:
-        """
-        if self.sentences is None:
-            self.__load_sentence()
-        self.__generate_questions()
+    # def full_mode(self):
+    #     """
+    #     全量模式：多选 4选4
+    #     :return:
+    #     """
+    #     if self.sentences is None:
+    #         self.__load_sentence()
+    #     self.__generate_questions()
 
-    def single_mode(self):
-        """
-        单项选择: 4选1
-        :return:
-        """
-        data = self.__generate_questions(limit_blank=1)
-        self.__dump_question(data)
+    # def single_mode(self):
+    #     """
+    #     单项选择: 4选1
+    #     :return:
+    #     """
+    #     data = self.__generate_questions(limit_blank=1)
+    #     self.__dump_question(data)
 
-    def lack_mode(self):
-        """
-        多选：缺省模式： 4选3
-        系统随机生成4选2的多选，或者4选3的多选
-        :return:
-        """
-        data = self.__generate_questions(3)
-        self.__dump_question(data)
+    # def lack_mode(self):
+    #     """
+    #     多选：缺省模式： 4选3
+    #     系统随机生成4选2的多选，或者4选3的多选
+    #     :return:
+    #     """
+    #     data = self.__generate_questions(3)
+    #     self.__dump_question(data)
 
     def __generate_questions(self, sentences=None, limit_blank=4):
         data = list()
         if sentences is None:
             sentences = self.sentences
+        # 关键词抽取， 相似度计算
         for sent in tqdm(sentences,
                          desc="[Writer Questions] type={type}".format(type=limit_blank)):
             if self.algorithm == 'text-rank':
@@ -192,7 +192,5 @@ class MultiChoiceGenerator(object):
             data = self.__generate_questions(sentences=tmp, limit_blank=i + 1)
             new_data = self.__trans_data(data)
             data.extend(new_data)
-            # df = pd.DataFrame(data=new_data, columns=user_setting.combine_columns)
-            # df.to_excel(writer, index_label='序号', sheet_name=user_setting.sheets[i])
             offset = end
         self.excel_utils.writer(data, self.excel_style)

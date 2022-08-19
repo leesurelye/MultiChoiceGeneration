@@ -29,8 +29,7 @@ class ExcelStyle(object):
         self.name = name
         if name == 'default':
             self.columns = system_setting.default_style['columns']
-            # TODO　
-            self.sheets = None
+            self.sheets = system_setting.default_style['sheets']
         elif name == 'detail':
             self.columns = system_setting.default_style['detail']
             self.sheets = system_setting.default_style['sheets']
@@ -50,7 +49,7 @@ class ExcelUtils(object):
         df = pd.DataFrame(data=data, columns=columns)
         with pd.ExcelWriter(self.output_file) as writer:
             df.to_excel(writer, index_label='序号')
-        writer.close()
+        # writer.close()
 
     # def composite_mode(self, data: list, scales, style: ExcelStyle):
     #     """ 综合模式 """
