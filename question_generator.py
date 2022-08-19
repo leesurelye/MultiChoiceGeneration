@@ -170,7 +170,7 @@ class MultiChoiceGenerator(object):
                 answers = ''
                 for i in range(1, 5):
                     if i in answer:
-                        answers += MultiChoiceGenerator.__mapping__[i - 4] + '\n'
+                        answers += MultiChoiceGenerator.__mapping__[i] + '\n'
                 new_row[2] = answers
                 new_data.append(new_row)
         return new_data
