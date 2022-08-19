@@ -5,6 +5,7 @@
 # 该文件为用户配置文件，可以按照说明修改相关配置
 # C:/Users/yue/Desktop/MultiChoice/
 # 需要生成问题的原始文本，需要的文件格式为docx
+
 word_file_path = "doc/浙江省第十五次党代会报告（全文）.docx"
 # excel文档输出位置
 excel_file_path = "result/questions.xlsx"
@@ -14,10 +15,12 @@ min_question_length = 40
 max_question_length = 200
 # 过滤标题长度
 filter_question_length = 30
-# 生成表格的标题
-columns = ["题干", "选项A", "选项B", "选项C", "选项D", "正确选项1", "正确选项2", "正确选项3", "正确选项4"]
-sheets = ['4选1', '4选2', '4选3', '4选4']
-default_columns = ["问题题干", "选项", "答案"]
-combine_columns = ["题干", "正确选项"]
+#  设置内容格式，用dict存储
+# 生成表格的风格
+excel_style = 'default'
+# columns = ["题干", "选项A", "选项B", "选项C", "选项D", "正确选项1", "正确选项2", "正确选项3", "正确选项4"]
+# sheets = ['4选1', '4选2', '4选3', '4选4']
+# default_columns = ["问题题干", "选项", "答案"]
+# combine_columns = ["题干", "正确选项"]
 # 生成问题的比列, 从左到右依次是，4选1, 4选2, 4选3, 4选4占比
 type_scale = [0.4, 0.2, 0.2, 0.2]

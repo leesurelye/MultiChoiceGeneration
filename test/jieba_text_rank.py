@@ -4,6 +4,9 @@
 import jieba
 import jieba.analyse
 from settings import system_setting
+from typing import Optional
+from typing import List, Optional
+from collections import Counter
 
 
 # jieba.load_userdict(system_setting.user_dict_path)
@@ -20,7 +23,40 @@ from settings import system_setting
 #     # Text Rank
 #     # tags = jieba.analyse.textrank(content, topK=8, allowPOS=('ns', 'n'))
 #     print(tags)
-class Test:
-    def test(self):
-        file = open("doc/.output/file.txt", 'r', encoding='utf8')
-        print(file.name)
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+
+class Solution:
+    def longestPalindrome(self, words: List[str]) -> int:
+        c = 0
+        mp = Counter(words)
+        for k, freq in mp.items():
+            if freq == 0:
+                continue
+            if k[0] == k[1]:
+                c = max(c, freq)
+                mp[k] = 0
+            else:
+                rev = k[::-1]
+                if rev in mp:
+                    mp[k] += mp[rev]
+                    mp[rev] = 0
+        ans = sum(v for _, v in mp.items())
+        return (ans + c) * 2
+
+
+if __name__ == '__main__':
+    s = Solution()
+    res = s.longestPalindrome(words = ["ab","ty","yt","lc","cl","ab"])
+    print(res)

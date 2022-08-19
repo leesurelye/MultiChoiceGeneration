@@ -5,21 +5,23 @@ import time
 import random
 from settings import system_setting
 from settings import user_setting
-from utils import WordUtils, ExcelUtils
+from utils import WordUtils, ExcelUtils, ExcelStyle
 from choices_generator import SimilarCalculate
 from key_word_extract import KeyExtract
 import os
 from typing import List
 from tqdm import tqdm
-import pandas as pd
 
 
 class MultiChoiceGenerator(object):
     __mapping__ = {1: 'A', 2: 'B', 3: 'C', 4: 'D'}
 
-    def __init__(self, algorithm='text-rank'):
-
+    # 当前默认的算法为text-rank, excel 表格的风格为 default_style
+    def __init__(self, algorithm='text-rank', excel_style=user_setting.excel_style):
+        # 存储当前设置的算法
         self.algorithm = algorithm
+        self.excel_style = ExcelStyle(excel_style)
+        # 判断算法是否为 api, tf-idf,  text-rank 算法之一
         if self.algorithm not in ['api', 'tf-idf', 'text-rank']:
             raise KeyError("algorithm key error {error}".format(error=algorithm))
         self.min_len = user_setting.min_question_length
@@ -36,9 +38,6 @@ class MultiChoiceGenerator(object):
         self.__load_sentence()
         self.question_writer = KeyExtract()
         self.choice_writer = SimilarCalculate()
-
-    def _config_parsing(self, config_path: str):
-        pass
 
     def _processed_word_file(self):
         self.word_utils.parsing()
@@ -124,18 +123,6 @@ class MultiChoiceGenerator(object):
         random.shuffle(cur)
         return cur
 
-    def __dump_question(self, data: list, style='combine'):
-        if os.path.exists(user_setting.excel_file_path):
-            os.remove(user_setting.excel_file_path)
-        if style == 'default':
-            self.excel_utils.writer(data, columns=user_setting.default_columns)
-        elif style == 'combine':
-            # new_data = self.__trans_data(data)
-            self.excel_utils.writer(data, columns=user_setting.combine_columns)
-        else:
-            # new_data = self.__trans_data(data, columns=user_setting.columns)
-            self.excel_utils.writer(data, columns=user_setting.columns)
-
     @staticmethod
     def __trans_data(data: list, columns: List[str]):
         new_data = list()
@@ -164,17 +151,24 @@ class MultiChoiceGenerator(object):
             new_data.append(new_row)
         return new_data
 
-    def composite_mode(self, scales=user_setting.type_scale, style='combine'):
+    def __dump_question(self, data: list):
+        if os.path.exists(user_setting.excel_file_path):
+            os.remove(user_setting.excel_file_path)
+        # 写入excel表格的代码，在修改excel表格风格
+        self.excel_utils.writer(data, self.excel_style)
+
+    def composite_mode(self, scales=user_setting.type_scale):
         """ 综合模式 """
         n = len(self.sentences)
         offset = 0
-        writer = pd.ExcelWriter(user_setting.excel_file_path)
+        data = list()
         for i in range(len(scales)):
             start, end = offset, offset + int(n * scales[i])
             tmp = self.sentences[start:end]
             data = self.__generate_questions(sentences=tmp, limit_blank=i + 1)
-            new_data = self.__trans_data(data, columns=user_setting.combine_columns)
-            df = pd.DataFrame(data=new_data, columns=user_setting.combine_columns)
-            df.to_excel(writer, index_label='序号', sheet_name=user_setting.sheets[i])
+            new_data = self.__trans_data(data, columns=self.excel_style.columns)
+            data.extend(new_data)
+            # df = pd.DataFrame(data=new_data, columns=user_setting.combine_columns)
+            # df.to_excel(writer, index_label='序号', sheet_name=user_setting.sheets[i])
             offset = end
-        writer.close()
+        self.excel_utils.writer(data, self.excel_style)

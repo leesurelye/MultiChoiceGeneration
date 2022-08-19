@@ -18,6 +18,7 @@ jieba.load_userdict(system_setting.user_dict_path)
 sys.path.append(os.getcwd())
 ROOT_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# 入口主函数
 if __name__ == '__main__':
     # t = jieba_text_rank.Test()
     # t.test()
